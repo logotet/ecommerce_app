@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "27286120949",
+    "project_id": "ecommerce-d38ad",
+    "storage_bucket": "ecommerce-d38ad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27286120949:android:6689b18103afe7de4d98bc",
+        "android_client_info": {
+          "package_name": "com.logotet.ecommerceapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "27286120949-7j2l4j1i0fvjj1gmkofdv17ouvab3st4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.logotet.ecommerceapp",
+            "certificate_hash": "666a0b473de8c2cb138bac71a6fba772e9f0bfe5"
+          }
+        },
+        {
+          "client_id": "27286120949-7kle2r11qoer44s2qji7iv3tbs9ohbu0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAMa_0LCR5qNqYRy220uYV-P6TXAOLvJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "27286120949-7kle2r11qoer44s2qji7iv3tbs9ohbu0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
