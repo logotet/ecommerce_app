@@ -1,4 +1,4 @@
-package com.logotet.ecommerceapp.utils;
+package com.logotet.ecommerceapp.utils.customviews;
 
 import android.content.Context;
 import android.graphics.Typeface;

@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.logotet.ecommerceapp.R;
 import com.logotet.ecommerceapp.databinding.ActivityLoginBinding;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity{
 
     ActivityLoginBinding binding;
     FirebaseAuth auth;
@@ -43,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
             if (binding.etEmail.getText().toString().trim() != null && binding.etPassword.getText().toString().trim() != null) {
                 email = binding.etEmail.getText().toString().trim();
                 password = binding.etPassword.getText().toString().trim();
+                showProgressDialog(getResources().getString(R.string.please_wait));
                 login();
             }
         });
@@ -52,17 +53,21 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        binding.tvForgotPassword.setOnClickListener(view ->
+                startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class))
+                );
+
     }
 
     private void login() {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
+            hideProgressBar();
             if (task.isSuccessful()) {
                 FirebaseUser user = auth.getCurrentUser();
                 goToMain(user);
             } else {
                 Toast.makeText(LoginActivity.this, "Authentication failed.",
                         Toast.LENGTH_SHORT).show();
-
             }
 
         });

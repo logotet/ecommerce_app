@@ -1,4 +1,4 @@
-package com.logotet.ecommerceapp.utils;
+package com.logotet.ecommerceapp.utils.customviews;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -6,10 +6,10 @@ import android.util.AttributeSet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatTextView;
 
-public class ECEditText extends AppCompatEditText {
-    public ECEditText(@NonNull Context context, @Nullable AttributeSet attrs) {
+public class ECPTextView extends AppCompatTextView {
+    public ECPTextView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         applyFont();
     }

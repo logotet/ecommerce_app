@@ -22,7 +22,7 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.logotet.ecommerceapp.utils.ECButton
+        <com.logotet.ecommerceapp.utils.customviews.ECButton
             android:id="@+id/btn_logout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
