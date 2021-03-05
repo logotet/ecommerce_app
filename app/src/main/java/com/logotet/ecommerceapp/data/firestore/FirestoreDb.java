@@ -1,6 +1,8 @@
 package com.logotet.ecommerceapp.data.firestore;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -48,18 +50,19 @@ public class FirestoreDb {
     }
 
     public void getUserDetails(Activity activity) {
+        SharedPreferences.Editor editor = activity.getSharedPreferences(AppConstants.ECOMMERCE_SHARED_PREFERENCES,
+                Context.MODE_PRIVATE).edit();
         db.collection(AppConstants.USERS)
                 .document(getCurrentUserId())
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        User user = task.getResult().toObject(User.class);
-                        Log.i("First :", user.getFirstName());
-                        Log.i("Last :", user.getLastName());
-                        Log.i("Email :", user.getEmail());
-                        Toast.makeText(activity.getBaseContext(), user.getFirstName(), Toast.LENGTH_LONG).show();
-                    }
+                .addOnCompleteListener(task -> {
+                    User user = task.getResult().toObject(User.class);
+                    Log.i("First :", user.getFirstName());
+                    Log.i("Last :", user.getLastName());
+                    Log.i("Email :", user.getEmail());
+                    editor.putInt(AppConstants.USER_PROFILE_COMPLETED, user.getProfileCompleted());
+                    editor.apply();
+                    Toast.makeText(activity.getBaseContext(), user.getFirstName(), Toast.LENGTH_LONG).show();
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(activity.getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show());

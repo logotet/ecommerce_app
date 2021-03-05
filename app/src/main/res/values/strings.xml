@@ -40,5 +40,6 @@
     <string name="rb_lbl_male">MALE</string>
     <string name="rb_lbl_female">FEMALE</string>
     <string name="btn_lbl_save">Save</string>
+    <string name="err_msg_enter_mobile">Please enter a valid mobile number</string>
 
 </resources>
