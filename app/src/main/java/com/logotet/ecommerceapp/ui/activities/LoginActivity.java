@@ -69,12 +69,12 @@ public class LoginActivity extends BaseActivity {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
             hideProgressBar();
             if (task.isSuccessful()) {
-                FirebaseUser firebaseUser = auth.getCurrentUser();
+                FirebaseUser user = auth.getCurrentUser();
                 int profileCompleted = sharedPreferences.getInt(AppConstants.USER_PROFILE_COMPLETED, 8);
                 if(profileCompleted == 0){
                     goToProfileSetup();
                 }else{
-                    goToMain(firebaseUser);
+                    goToMain(user);
                 }
             } else {
                 Toast.makeText(LoginActivity.this, "Authentication failed.",

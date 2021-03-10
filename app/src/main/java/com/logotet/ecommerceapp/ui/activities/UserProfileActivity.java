@@ -27,6 +27,9 @@ import com.logotet.ecommerceapp.utils.AppConstants;
 import com.logotet.ecommerceapp.utils.images.GalleryManager;
 import com.logotet.ecommerceapp.utils.images.GlideHelper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserProfileActivity extends BaseActivity {
 
     private ActivityUserProfileBinding binding;
@@ -35,6 +38,8 @@ public class UserProfileActivity extends BaseActivity {
     private FirebaseUser firebaseUser;
     private FirestoreDb firestoreDb;
     private final static int READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 1;
+    private User user;
+    private Uri dataUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,46 +50,54 @@ public class UserProfileActivity extends BaseActivity {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         firestoreDb = new FirestoreDb();
         firestoreDb.getUserDetails(this);
+        user = new User();
 
-//        getIntent().getParcelableExtra()
-
-        binding.flUserImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                checkPermission();
-            }
-        });
+        binding.flUserImage.setOnClickListener(view -> checkPermission());
 
         binding.btnSave.setOnClickListener(view -> {
-            if(validateRegisterDetails()){
-                completeUserProfile();
+            if (validateRegisterDetails()) {
+                showProgressDialog("P");
                 editor.putInt(AppConstants.USER_PROFILE_COMPLETED, 1);
                 editor.apply();
-            }});
+                updateUser();
+                firestoreDb.uploadImg(this, dataUri);
+                hideProgressBar();
+            }
+        });
     }
 
-    private void completeUserProfile() {
-        User user = new User();
-        user.setId(firebaseUser.getUid());
-        user.setFirstName(binding.etFirstName.getText().toString().trim());
-        user.setLastName(binding.etLastName.getText().toString().trim());
-        user.setEmail(binding.etEmail.getText().toString().trim());
-        user.setImage("1");
-        user.setMobile(Long.parseLong(binding.etMobileNumber.getText().toString().trim()));
-        user.setGender("male");
-        Intent intent = new Intent(UserProfileActivity.this, MainActivity.class);
-        intent.putExtra("email", user.getEmail());
-        intent.putExtra("uid", user.getId());
-        intent.putExtra(AppConstants.USER_DETAILS, user);
-        startActivity(intent);
+    private String getGender() {
+        if (binding.rbMale.isPressed()) {
+            return AppConstants.MALE;
+        } else {
+            return AppConstants.FEMALE;
+        }
     }
+
+    private void updateUser() {
+//        //        user.setId(firebaseUser.getUid());
+////        user.setFirstName(binding.etFirstName.getText().toString().trim());
+////        user.setLastName(binding.etLastName.getText().toString().trim());
+////        user.setEmail(binding.etEmail.getText().toString().trim());
+//        Map<String, Object> userDetails = new HashMap<>();
+//        showProgressDialog(getResources().getString(R.string.please_wait));
+//        user.setImage("1");
+//        user.setMobile(Long.parseLong(binding.etMobileNumber.getText().toString().trim()));
+//        user.setGender("male");
+        HashMap<String, Object> userHashMap = new HashMap<>();
+        long mobileNumber = Long.parseLong(binding.etMobileNumber.getText().toString().trim());
+        userHashMap.put(AppConstants.MOBILE, mobileNumber);
+        String gender = getGender();
+        userHashMap.put(AppConstants.GENDER, gender);
+        firestoreDb.updateUserDetails(this, userHashMap);
+    }
+
 
     private boolean validateRegisterDetails() {
         if (TextUtils.isEmpty(binding.etFirstName.getText().toString().trim())) {
             showErrorSnackBar(getResources().getString(R.string.err_msg_enter_first_name), true);
             return false;
         }
-
         if (TextUtils.isEmpty(binding.etLastName.getText().toString().trim())) {
             showErrorSnackBar(getResources().getString(R.string.err_msg_enter_last_name), true);
             return false;
@@ -93,27 +106,38 @@ public class UserProfileActivity extends BaseActivity {
             showErrorSnackBar(getResources().getString(R.string.err_msg_enter_email), true);
             return false;
         }
-
         if (TextUtils.isEmpty(binding.etMobileNumber.getText().toString().trim())) {
             showErrorSnackBar(getResources().getString(R.string.err_msg_enter_mobile), true);
             return false;
         }
-
-//        if (TextUtils.isEmpty(binding.etConfirmPassword.getText().toString().trim())) {
-//            showErrorSnackBar(getResources().getString(R.string.err_msg_enter_confirm_password), true);
-//            return false;
-//        }
-
-
         showErrorSnackBar("Your details are valid.", false);
         return true;
     }
 
-    public void checkPermission(){
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED){
+    public void userProfileUpdateSuccess() {
+        Toast.makeText(
+                this,
+                getResources().getString(R.string.msg_profile_update_success),
+                Toast.LENGTH_SHORT
+        ).show();
+        startActivity(new Intent(UserProfileActivity.this, MainActivity.class));
+        finish();
+    }
+
+    public void imageUploadSuccess(String imageURL) {
+        hideProgressBar();
+        Toast.makeText(
+                UserProfileActivity.this,
+        "Your image is uploaded successfully. Image URL is $imageURL",
+                Toast.LENGTH_SHORT
+        ).show();
+    }
+
+    public void checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED) {
             GalleryManager.chooseImageFromGallery(UserProfileActivity.this);
-        }else {
+        } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE);
         }
@@ -122,10 +146,10 @@ public class UserProfileActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 GalleryManager.chooseImageFromGallery(UserProfileActivity.this);
-            }else {
+            } else {
                 Toast.makeText(this, "Camera permission denied", Toast.LENGTH_LONG).show();
             }
         }
@@ -134,15 +158,14 @@ public class UserProfileActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == Activity.RESULT_OK){
-            if(requestCode == GalleryManager.PICK_IMAGE_REQUEST_CODE){
-                if(data != null){
-                    try{
-                        Uri dataUri = data.getData();
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == GalleryManager.PICK_IMAGE_REQUEST_CODE) {
+                if (data != null) {
+                    try {
+                        dataUri = data.getData();
                         new GlideHelper(this).loadUserPicture(dataUri, binding.ivUserPhoto);
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-
                     }
                 }
             }

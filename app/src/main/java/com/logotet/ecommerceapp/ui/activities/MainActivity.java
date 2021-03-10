@@ -32,24 +32,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         firestoreDb = new FirestoreDb();
-        String email = getIntent().getExtras().get("email").toString();
-        String uid = getIntent().getExtras().get("uid").toString();
-
-        binding.txtInfo.setText(email + " " + uid);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         firestoreDb.getUserDetails(this);
 
-        binding.btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-                Toast.makeText(MainActivity
-                                .this, "You signed out!",
-                        Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            }
+        binding.btnLogout.setOnClickListener(view -> {
+            FirebaseAuth.getInstance().signOut();
+            Toast.makeText(MainActivity
+                            .this, "You signed out!",
+                    Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
         });
 
     }
