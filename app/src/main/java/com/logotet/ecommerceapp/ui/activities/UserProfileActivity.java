@@ -90,6 +90,7 @@ public class UserProfileActivity extends BaseActivity {
         String gender = getGender();
         userHashMap.put(AppConstants.GENDER, gender);
         userHashMap.put(AppConstants.IMAGE, userProfileImageUrl);
+        userHashMap.put(AppConstants.PROFILE_COMPLETED, 1);
         firestoreDb.updateUserDetails(this, userHashMap);
     }
 

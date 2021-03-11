@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.logotet.ecommerceapp">
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -12,7 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.EcommerceApp">
-        <activity android:name=".ui.activities.UserProfileActivity"></activity>
+        <activity
+            android:name=".ui.activities.DashboardActivity"
+            android:label="@string/title_activity_dashboard"></activity>
+        <activity android:name=".ui.activities.UserProfileActivity" />
         <activity android:name=".ui.activities.ForgotPasswordActivity" />
         <activity android:name=".ui.activities.RegisterActivity" />
         <activity android:name=".ui.activities.LoginActivity" />
@@ -23,8 +26,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.MainActivity"
-            android:launchMode = "singleTask"/>
+        <activity
+            android:name=".ui.activities.MainActivity"
+            android:launchMode="singleTask" />
     </application>
 
 </manifest>

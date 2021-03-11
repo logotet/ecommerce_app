@@ -40,5 +40,9 @@
     <string name="btn_lbl_save">Save</string>
     <string name="err_msg_enter_mobile">Please enter a valid mobile number</string>
     <string name="msg_profile_update_success">Profile was updated successfully</string>
+    <string name="title_activity_dashboard">MainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 
 </resources>
