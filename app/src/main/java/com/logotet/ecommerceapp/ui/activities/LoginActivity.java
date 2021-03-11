@@ -76,7 +76,8 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void goToMain(FirebaseUser user) {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//        for now go to dashboard activity
+        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra("email", user.getEmail());
         intent.putExtra("uid", user.getUid());
@@ -93,7 +94,8 @@ public class LoginActivity extends BaseActivity {
             intent.putExtra(AppConstants.USER_DETAILS, user);
             startActivity(intent);
         } else {
-            startActivity(new Intent(LoginActivity.this,MainActivity.class));
+            //        for now go to dashboard activity
+            startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
         }
         finish();
     }

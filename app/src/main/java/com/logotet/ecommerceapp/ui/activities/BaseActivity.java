@@ -1,8 +1,10 @@
 package com.logotet.ecommerceapp.ui.activities;
 
 import android.app.Dialog;
+import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -12,6 +14,7 @@ import com.logotet.ecommerceapp.R;
 
 public class BaseActivity extends AppCompatActivity {
     private Dialog progressDialog;
+    private boolean doebleBackPressedOnce = false;
 
     public void showErrorSnackBar(String message, Boolean errorMessage) {
         Snackbar snackBar =
@@ -49,5 +52,15 @@ public class BaseActivity extends AppCompatActivity {
 
     public void hideProgressBar(){
         progressDialog.dismiss();
+    }
+
+    public void doubleBackToExit(){
+        if(doebleBackPressedOnce){
+            finishAndRemoveTask();
+            return;
+        }
+        this.doebleBackPressedOnce = true;
+        Toast.makeText(this, getResources().getString(R.string.please_click_back_again_to_exit), Toast.LENGTH_SHORT).show();
+        new Handler().postDelayed(() -> doebleBackPressedOnce = false, 2000);
     }
 }

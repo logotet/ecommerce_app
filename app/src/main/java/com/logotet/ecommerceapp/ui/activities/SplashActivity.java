@@ -19,8 +19,10 @@ public class SplashActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         new Handler().postDelayed(() -> {
-            Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+            //        for now go to dashboard activity
+            Intent intent = new Intent(SplashActivity.this, DashboardActivity.class);
             startActivity(intent);
+            finish();
         }, 1000);
     }
 }

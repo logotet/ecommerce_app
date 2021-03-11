@@ -1,4 +1,4 @@
-package com.logotet.ecommerceapp.ui.activities.ui.dashboard;
+package com.logotet.ecommerceapp.ui.fragments.dashboard;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
