@@ -1,4 +1,4 @@
-package com.logotet.ecommerceapp.ui.fragments.home;
+package com.logotet.ecommerceapp.ui.fragments.products;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,21 +10,21 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import com.logotet.ecommerceapp.R;
-import com.logotet.ecommerceapp.databinding.FragmentHomeBinding;
+import com.logotet.ecommerceapp.databinding.FragmentPrductsBinding;
 
-public class HomeFragment extends Fragment {
+public class ProductsFragment extends Fragment {
 
-    private HomeViewModel homeViewModel;
-    private FragmentHomeBinding binding;
+    private ProductsViewModel productsViewModel;
+    private FragmentPrductsBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-//        homeViewModel =
-//                new ViewModelProvider(this).get(HomeViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
+//        productsViewModel =
+//                new ViewModelProvider(this).get(ProductsViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_prducts, container, false);
         binding = DataBindingUtil.bind(root);
         binding.textHome.setText("Kur Home");
-//        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//        productsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
 //            @Override
 //            public void onChanged(@Nullable String s) {
 //                textView.setText(s);
