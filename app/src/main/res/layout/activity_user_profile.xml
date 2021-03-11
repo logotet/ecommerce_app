@@ -170,8 +170,6 @@
                         android:textSize="@dimen/et_textSize" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!--TODO Step 4: Add remaining design of the layout for user profile screen.-->
-                <!--START-->
                 <RadioGroup
                     android:id="@+id/rg_gender"
                     android:layout_width="match_parent"

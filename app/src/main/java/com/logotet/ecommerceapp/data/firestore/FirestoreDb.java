@@ -1,28 +1,18 @@
 package com.logotet.ecommerceapp.data.firestore;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.logotet.ecommerceapp.models.User;
+import com.logotet.ecommerceapp.ui.activities.LoginActivity;
 import com.logotet.ecommerceapp.ui.activities.RegisterActivity;
 import com.logotet.ecommerceapp.ui.activities.UserProfileActivity;
 import com.logotet.ecommerceapp.utils.AppConstants;
@@ -32,6 +22,7 @@ import java.util.HashMap;
 public class FirestoreDb {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private User user;
 
     public void registerUser(RegisterActivity activity, User firebaseUser) {
         if (firebaseUser != null) {
@@ -59,19 +50,14 @@ public class FirestoreDb {
     }
 
     public void getUserDetails(Activity activity) {
-        SharedPreferences.Editor editor = activity.getSharedPreferences(AppConstants.ECOMMERCE_SHARED_PREFERENCES,
-                Context.MODE_PRIVATE).edit();
         db.collection(AppConstants.USERS)
                 .document(getCurrentUserId())
                 .get()
                 .addOnCompleteListener(task -> {
-                    User user = task.getResult().toObject(User.class);
-                    Log.i("First :", user.getFirstName());
-                    Log.i("Last :", user.getLastName());
-                    Log.i("Email :", user.getEmail());
-                    editor.putInt(AppConstants.USER_PROFILE_COMPLETED, user.getProfileCompleted());
-                    editor.apply();
-                    Toast.makeText(activity.getBaseContext(), user.getFirstName(), Toast.LENGTH_LONG).show();
+                    if(activity instanceof LoginActivity){
+                        user = task.getResult().toObject(User.class);
+                        ((LoginActivity) activity).userLoggedInSuccess(user);
+                    }
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(activity.getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show());
@@ -97,22 +83,19 @@ public class FirestoreDb {
 
 
         storageReference.putFile(imgFileUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Log.e("Firebase Image URL", taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
-                        Toast.makeText(activity.getBaseContext(), "Image", Toast.LENGTH_LONG).show();
-                        if(activity instanceof UserProfileActivity){
-                            ((UserProfileActivity) activity).imageUploadSuccess(imgFileUri.toString());
-                        }
-                    }
+                .addOnSuccessListener(taskSnapshot -> {
+                    Log.e("Firebase Image URL", taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
+                    Toast.makeText(activity.getBaseContext(), "Image Success", Toast.LENGTH_LONG).show();
+                    taskSnapshot.getMetadata().getReference().getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                if(activity instanceof UserProfileActivity){
+                                    ((UserProfileActivity) activity).imageUploadSuccess(uri.toString());
+                                }
+                            });
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(activity.getClass().getSimpleName(), e.getMessage(), e);
-                        Toast.makeText(activity.getBaseContext(), "Image Fail", Toast.LENGTH_LONG).show();
-                    }
+                .addOnFailureListener(e -> {
+                    Log.e(activity.getClass().getSimpleName(), e.getMessage(), e);
+                    Toast.makeText(activity.getBaseContext(), "Image Fail", Toast.LENGTH_LONG).show();
                 });
     }
 

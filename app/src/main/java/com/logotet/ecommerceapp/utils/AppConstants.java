@@ -14,6 +14,7 @@ public class AppConstants {
     public static final String MOBILE = "mobile";
     public static final String MALE = "male";
     public static final String FEMALE = "female";
+    public static final String IMAGE = "image";
     public static final String USER_PROFILE_IMAGE = "user_profile_image";
 
     public static String getFileExtension(Activity activity, Uri uri){

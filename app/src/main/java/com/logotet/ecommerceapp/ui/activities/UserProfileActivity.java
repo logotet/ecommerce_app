@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,7 +27,6 @@ import com.logotet.ecommerceapp.utils.images.GalleryManager;
 import com.logotet.ecommerceapp.utils.images.GlideHelper;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class UserProfileActivity extends BaseActivity {
 
@@ -40,6 +38,7 @@ public class UserProfileActivity extends BaseActivity {
     private final static int READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 1;
     private User user;
     private Uri dataUri;
+    private String userProfileImageUrl = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +48,11 @@ public class UserProfileActivity extends BaseActivity {
         editor = sharedPreferences.edit();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         firestoreDb = new FirestoreDb();
+        try{
+            updateUserFields(getIntent().getParcelableExtra(AppConstants.USER_DETAILS));
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
         firestoreDb.getUserDetails(this);
         user = new User();
 
@@ -59,53 +63,38 @@ public class UserProfileActivity extends BaseActivity {
                 showProgressDialog("P");
                 editor.putInt(AppConstants.USER_PROFILE_COMPLETED, 1);
                 editor.apply();
-                updateUser();
                 firestoreDb.uploadImg(this, dataUri);
+                updateUser();
                 hideProgressBar();
             }
         });
     }
 
+    public void updateUserFields(User user) {
+        binding.etFirstName.setText(user.getFirstName());
+        binding.etFirstName.setEnabled(false);
+        binding.etLastName.setText(user.getLastName());
+        binding.etLastName.setEnabled(false);
+        binding.etEmail.setText(user.getEmail());
+        binding.etEmail.setEnabled(false);
+    }
+
     private String getGender() {
-        if (binding.rbMale.isPressed()) {
-            return AppConstants.MALE;
-        } else {
-            return AppConstants.FEMALE;
-        }
+        return binding.rbMale.isChecked() ? AppConstants.MALE : AppConstants.FEMALE;
     }
 
     private void updateUser() {
-//        //        user.setId(firebaseUser.getUid());
-////        user.setFirstName(binding.etFirstName.getText().toString().trim());
-////        user.setLastName(binding.etLastName.getText().toString().trim());
-////        user.setEmail(binding.etEmail.getText().toString().trim());
-//        Map<String, Object> userDetails = new HashMap<>();
-//        showProgressDialog(getResources().getString(R.string.please_wait));
-//        user.setImage("1");
-//        user.setMobile(Long.parseLong(binding.etMobileNumber.getText().toString().trim()));
-//        user.setGender("male");
         HashMap<String, Object> userHashMap = new HashMap<>();
         long mobileNumber = Long.parseLong(binding.etMobileNumber.getText().toString().trim());
         userHashMap.put(AppConstants.MOBILE, mobileNumber);
         String gender = getGender();
         userHashMap.put(AppConstants.GENDER, gender);
+        userHashMap.put(AppConstants.IMAGE, userProfileImageUrl);
         firestoreDb.updateUserDetails(this, userHashMap);
     }
 
 
     private boolean validateRegisterDetails() {
-        if (TextUtils.isEmpty(binding.etFirstName.getText().toString().trim())) {
-            showErrorSnackBar(getResources().getString(R.string.err_msg_enter_first_name), true);
-            return false;
-        }
-        if (TextUtils.isEmpty(binding.etLastName.getText().toString().trim())) {
-            showErrorSnackBar(getResources().getString(R.string.err_msg_enter_last_name), true);
-            return false;
-        }
-        if (TextUtils.isEmpty(binding.etEmail.getText().toString().trim())) {
-            showErrorSnackBar(getResources().getString(R.string.err_msg_enter_email), true);
-            return false;
-        }
         if (TextUtils.isEmpty(binding.etMobileNumber.getText().toString().trim())) {
             showErrorSnackBar(getResources().getString(R.string.err_msg_enter_mobile), true);
             return false;
@@ -126,11 +115,8 @@ public class UserProfileActivity extends BaseActivity {
 
     public void imageUploadSuccess(String imageURL) {
         hideProgressBar();
-        Toast.makeText(
-                UserProfileActivity.this,
-        "Your image is uploaded successfully. Image URL is $imageURL",
-                Toast.LENGTH_SHORT
-        ).show();
+        userProfileImageUrl = imageURL;
+        updateUser();
     }
 
     public void checkPermission() {
@@ -166,6 +152,9 @@ public class UserProfileActivity extends BaseActivity {
                         new GlideHelper(this).loadUserPicture(dataUri, binding.ivUserPhoto);
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                        dataUri = Uri.parse("android.resource://"+getBaseContext().getPackageName()+"/drawable/"
+                                + getResources().getResourceName(R.drawable.ic_user_placeholder));
+
                     }
                 }
             }

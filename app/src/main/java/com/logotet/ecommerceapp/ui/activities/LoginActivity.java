@@ -1,25 +1,20 @@
 package com.logotet.ecommerceapp.ui.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ViewDataBinding;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import androidx.databinding.DataBindingUtil;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.logotet.ecommerceapp.R;
+import com.logotet.ecommerceapp.data.firestore.FirestoreDb;
 import com.logotet.ecommerceapp.databinding.ActivityLoginBinding;
+import com.logotet.ecommerceapp.models.User;
 import com.logotet.ecommerceapp.utils.AppConstants;
 
 public class LoginActivity extends BaseActivity {
@@ -28,7 +23,8 @@ public class LoginActivity extends BaseActivity {
     private FirebaseAuth auth;
     private String email;
     private String password;
-    SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
+    private FirestoreDb firestoreDb;
 
 
     @Override
@@ -38,6 +34,7 @@ public class LoginActivity extends BaseActivity {
         auth = FirebaseAuth.getInstance();
         sharedPreferences = this.getSharedPreferences(AppConstants.ECOMMERCE_SHARED_PREFERENCES,
                 Context.MODE_PRIVATE);
+        firestoreDb = new FirestoreDb();
 
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
@@ -69,13 +66,7 @@ public class LoginActivity extends BaseActivity {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
             hideProgressBar();
             if (task.isSuccessful()) {
-                FirebaseUser user = auth.getCurrentUser();
-                int profileCompleted = sharedPreferences.getInt(AppConstants.USER_PROFILE_COMPLETED, 8);
-                if(profileCompleted == 0){
-                    goToProfileSetup();
-                }else{
-                    goToMain(user);
-                }
+                firestoreDb.getUserDetails(this);
             } else {
                 Toast.makeText(LoginActivity.this, "Authentication failed.",
                         Toast.LENGTH_SHORT).show();
@@ -84,17 +75,26 @@ public class LoginActivity extends BaseActivity {
         });
     }
 
-    private void goToProfileSetup() {
-        Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-    }
-
     private void goToMain(FirebaseUser user) {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra("email", user.getEmail());
         intent.putExtra("uid", user.getUid());
         startActivity(intent);
+    }
+
+    public void userLoggedInSuccess(User user) {
+        hideProgressBar();
+        Log.i("First Name: ", user.getFirstName());
+        Log.i("Last Name: ", user.getLastName());
+        Log.i("Email: ", user.getEmail());
+        if (user.getProfileCompleted() == 0) {
+            Intent intent = new Intent(LoginActivity.this, UserProfileActivity.class);
+            intent.putExtra(AppConstants.USER_DETAILS, user);
+            startActivity(intent);
+        } else {
+            startActivity(new Intent(LoginActivity.this,MainActivity.class));
+        }
+        finish();
     }
 }
