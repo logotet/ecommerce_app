@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
@@ -48,13 +49,12 @@ public class UserProfileActivity extends BaseActivity {
         editor = sharedPreferences.edit();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         firestoreDb = new FirestoreDb();
-        try{
-            updateUserFields(getIntent().getParcelableExtra(AppConstants.USER_DETAILS));
-        }catch (NullPointerException e){
-            e.printStackTrace();
+
+        user = getIntent().getParcelableExtra(AppConstants.USER_DETAILS);
+        if(user != null){
+            updateUserFields(user);
         }
-        firestoreDb.getUserDetails(this);
-        user = new User();
+
 
         binding.flUserImage.setOnClickListener(view -> checkPermission());
 
@@ -77,6 +77,21 @@ public class UserProfileActivity extends BaseActivity {
         binding.etLastName.setEnabled(false);
         binding.etEmail.setText(user.getEmail());
         binding.etEmail.setEnabled(false);
+        if(user.getProfileCompleted() != 0){
+            new GlideHelper(this).loadUserPicture(user.getImage(), binding.ivUserPhoto);
+            binding.etMobileNumber.setText(String.valueOf(user.getMobile()));
+        }
+    }
+
+    private void setupActionbar() {
+        setSupportActionBar(binding.toolbarUserProfileActivity);
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back);
+        }
+
+        binding.toolbarUserProfileActivity.setNavigationOnClickListener(view -> onBackPressed());
     }
 
     private String getGender() {
@@ -153,7 +168,7 @@ public class UserProfileActivity extends BaseActivity {
                         new GlideHelper(this).loadUserPicture(dataUri, binding.ivUserPhoto);
                     } catch (Exception e) {
                         Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-                        dataUri = Uri.parse("android.resource://"+getBaseContext().getPackageName()+"/drawable/"
+                        dataUri = Uri.parse("android.resource://" + getBaseContext().getPackageName() + "/drawable/"
                                 + getResources().getResourceName(R.drawable.ic_user_placeholder));
 
                     }

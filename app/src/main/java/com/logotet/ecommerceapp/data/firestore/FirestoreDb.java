@@ -5,6 +5,9 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -12,8 +15,10 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.logotet.ecommerceapp.models.User;
+import com.logotet.ecommerceapp.ui.activities.BaseActivity;
 import com.logotet.ecommerceapp.ui.activities.LoginActivity;
 import com.logotet.ecommerceapp.ui.activities.RegisterActivity;
+import com.logotet.ecommerceapp.ui.activities.SettingsActivity;
 import com.logotet.ecommerceapp.ui.activities.UserProfileActivity;
 import com.logotet.ecommerceapp.utils.AppConstants;
 
@@ -54,13 +59,20 @@ public class FirestoreDb {
                 .document(getCurrentUserId())
                 .get()
                 .addOnCompleteListener(task -> {
-                    if(activity instanceof LoginActivity){
+                    if (activity instanceof LoginActivity) {
                         user = task.getResult().toObject(User.class);
                         ((LoginActivity) activity).userLoggedInSuccess(user);
                     }
+                    if (activity instanceof SettingsActivity) {
+                        user = task.getResult().toObject(User.class);
+                        ((SettingsActivity) activity).setUserInfo(user);
+                    }
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(activity.getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show());
+                .addOnFailureListener(e -> {
+                    if (activity instanceof LoginActivity || activity instanceof SettingsActivity) {
+                        ((BaseActivity) activity).hideProgressBar();
+                    }
+                });
     }
 
     public void updateUserDetails(Activity activity, HashMap<String, Object> userDetails) {
@@ -88,7 +100,7 @@ public class FirestoreDb {
                     Toast.makeText(activity.getBaseContext(), "Image Success", Toast.LENGTH_LONG).show();
                     taskSnapshot.getMetadata().getReference().getDownloadUrl()
                             .addOnSuccessListener(uri -> {
-                                if(activity instanceof UserProfileActivity){
+                                if (activity instanceof UserProfileActivity) {
                                     ((UserProfileActivity) activity).imageUploadSuccess(uri.toString());
                                 }
                             });

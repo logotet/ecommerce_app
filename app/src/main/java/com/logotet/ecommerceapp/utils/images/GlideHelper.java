@@ -15,11 +15,11 @@ public class GlideHelper {
         this.context = context;
     }
 
-    public void loadUserPicture(Uri imageUri, ImageView imageView) {
+    public void loadUserPicture(Object image, ImageView imageView) {
         try {
             Glide
                     .with(context)
-                    .load(Uri.parse(imageUri.toString()))
+                    .load(Uri.parse(image.toString()))
                     .centerCrop()
                     .placeholder(R.drawable.ic_user_placeholder)
                     .into(imageView);
